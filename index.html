@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold Of the Golds</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ffffff;
+            --bg: #000000;
+            --text: #ffffff;
+            --accent: #0066ff;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Unique grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(230, 233, 232, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: 1;
+        }
+
+        .terminal-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        /* Top terminal bar */
+        .terminal-header {
+            height: 40px;
+            background: rgba(223, 223, 223, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .terminal-header::before {
+            content: '> GOLD_OF_THE_GOLDS.exe';
+            color: var(--primary);
+        }
+
+        /* Main content area */
+        .main-display {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Logo container - no rotation since GIF already spins */
+        .logo-zone {
+            position: relative;
+    width: 300px;
+    height: 300px;
+            margin-bottom: 40px;
+        }
+
+        .logo-frame {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-frame::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 8px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        .logo-placeholder {
+            font-size: 4rem;
+            font-weight: 100;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        /* Terminal text styling */
+        .coin-title {
+            font-size: 1.2rem;
+            font-weight: 200;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+
+        /* Phantom wallet connection */
+        .wallet-section {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .phantom-connect {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phantom-connect:hover {
+            background: var(--primary);
+            color: var(--bg);
+            box-shadow: 0 0 30px rgba(249, 255, 252, 0.5);
+        }
+
+        .phantom-connect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .phantom-connect:hover::before {
+            left: 100%;
+        }
+
+        /* Connection status */
+        .wallet-status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+
+        .connected {
+            color: var(--primary);
+        }
+
+        /* Side data streams */
+        .data-stream {
+            position: fixed;
+            font-size: 10px;
+            font-weight: 100;
+            opacity: 0.3;
+            font-family: 'JetBrains Mono', monospace;
+            animation: dataScroll 15s linear infinite;
+        }
+
+        .stream-left {
+            left: 20px;
+            top: 50%;
+            transform: rotate(-90deg);
+            transform-origin: left;
+        }
+
+        .stream-right {
+            right: 20px;
+            top: 50%;
+            transform: rotate(90deg);
+            transform-origin: right;
+        }
+
+        /* Corner indicators */
+        .corner-indicator {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--primary);
+            opacity: 0.4;
+        }
+
+        .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        /* Animations */
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes dataScroll {
+            0% { transform: translateY(100vh) rotate(-90deg); }
+            100% { transform: translateY(-100vh) rotate(-90deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo-zone {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .logo-placeholder {
+                font-size: 3rem;
+            }
+            
+            .coin-title {
+                font-size: 1rem;
+            }
+            
+            .data-stream {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-interface">
+        <div class="terminal-header"></div>
+        
+        <div class="main-display">
+            <div class="logo-zone">
+                <div class="logo-frame">
+                    <!-- Your spinning GIF goes here - no rotation applied -->
+<img src="3dgifmaker04836.gif" alt="Coin Of The Coin" style="max-width: 100%; max-height: 100%;">                </div>
+            </div>
+            
+            <div class="coin-title">
+                Not just any gold, but the gold of the goldss
+            </div>
+            
+            <div class="wallet-section">
+                <button class="phantom-connect" id="connectWallet">
+                    Connect Phantom
+                </button>
+                <div class="wallet-status" id="walletStatus">
+                    Wallet disconnected
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Corner indicators -->
+    <div class="corner-indicator top-left"></div>
+    <div class="corner-indicator top-right"></div>
+    <div class="corner-indicator bottom-left"></div>
+    <div class="corner-indicator bottom-right"></div>
+
+    <!-- Data streams -->
+    <div class="data-stream stream-left">
+        4Rzces2tJzcW7yF8PwnZsRQGFMmBS1XXh6VgJN6rCRh9...
+    </div>
+    <div class="data-stream stream-right">
+        BLOCK:847293 HASH:DqeA3EU4DNuTsMVL5QBEibhC6LEQWUgDdESiTNbS8ia...
+    </div>
+
+    <script>
+        // Phantom Wallet Connection
+        let walletConnected = false;
+        const connectButton = document.getElementById('connectWallet');
+        const walletStatus = document.getElementById('walletStatus');
+
+        async function connectPhantom() {
+            try {
+                // Check if Phantom is installed
+                if (window.solana && window.solana.isPhantom) {
+                    // Request connection
+                    const response = await window.solana.connect();
+                    
+                    if (response.publicKey) {
+                        walletConnected = true;
+                        const publicKey = response.publicKey.toString();
+                        const shortKey = publicKey.slice(0, 4) + '...' + publicKey.slice(-4);
+                        
+                        connectButton.textContent = shortKey;
+                        walletStatus.textContent = 'Phantom Connected';
+                        walletStatus.classList.add('connected');
+                        
+                        console.log('Connected to Phantom:', publicKey);
+                    }
+                } else {
+                    // Phantom not installed
+                    alert('Phantom wallet not detected. Please install Phantom wallet extension.');
+                    window.open('https://phantom.app/', '_blank');
+                }
+            } catch (error) {
+                console.error('Connection failed:', error);
+                walletStatus.textContent = 'Connection failed';
+            }
+        }
+
+        connectButton.addEventListener('click', connectPhantom);
+
+        // Check if already connected on page load
+        window.addEventListener('load', async () => {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect({ onlyIfTrusted: true });
+                    if (response.publicKey) {
+                        const publicKey = response.publicKey.toString();
+                        const shortKey = publicKey.slice(0, 4) + '...' + publicKey.slice(-4);
+                        
+                        connectButton.textContent = shortKey;
+                        walletStatus.textContent = 'Phantom Connected';
+                        walletStatus.classList.add('connected');
+                        walletConnected = true;
+                    }
+                } catch (error) {
+                    // User hasn't approved connection yet
+                }
+            }
+        });
+
+        // Terminal cursor effect
+        let cursorVisible = true;
+        setInterval(() => {
+            const cursor = document.querySelector('.terminal-header::after');
+            cursorVisible = !cursorVisible;
+        }, 500);
+    </script>
+</body>
+</html>
